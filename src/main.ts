@@ -14,8 +14,8 @@ async function bootstrap() {
     transform: true,
   }));
   const config = new DocumentBuilder()
-    .setTitle('API для кт4')
-    .setDescription('Документация кт4 API')
+    .setTitle('API для Nest API')
+    .setDescription('Документация Nest API')
     .setVersion('1.0')
     .build();
 

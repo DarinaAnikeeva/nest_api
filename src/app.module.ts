@@ -17,22 +17,23 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
 @Module({
   imports: [
-    TasksModule,
-    UsersModule,
-    AuthModule,
-    LogsModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5433,
-      username: 'postgres',
-      password: 'secret',
-      database: 'mydb',
-      logging: true,
-      autoLoadEntities: true,
-      synchronize: false,
-      entities: [User, Task],
+    ConfigModule.forRoot({
+      isGlobal: true,
     }),
+
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        type: 'postgres',
+        url: config.get<string>('DATABASE_URL'),
+        logging: false,
+        autoLoadEntities: true,
+        synchronize: true,
+        entities: [User, Task],
+      }),
+    }),
+
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -40,9 +41,11 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
         uri: config.get<string>('MONGODB_URI'),
       }),
     }),
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+
+    TasksModule,
+    UsersModule,
+    AuthModule,
+    LogsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
